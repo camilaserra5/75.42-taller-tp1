@@ -12,11 +12,11 @@
 static const char *ERROR_UNSUPPORTED = "No se reconoce el comando ingresado\n";
 static const char *INVALID_USE_CLIENT = "Uso: ./tp client <host> <puerto> --method=<method> --key=<key>\n";
 
-static bool _send_encoded_key(char* key, socket_t socket) {
+static bool _send_encoded_key(char* key, int len, socket_t socket) {
     protocol_t protocol;
     protocol_init(&protocol, &socket);
 
-    protocol_client_send(&protocol, key, strlen(key));
+    protocol_client_send(&protocol, key, len);
 
     protocol_destroy(&protocol);
     return 1;
@@ -29,7 +29,7 @@ int read_and_send(void (*func)(char *, int, char*), char* key, socket_t socket){
     do {
         read = fread(buffer, sizeof(char), BUFFER_SIZE, stdin);
         (*func)(buffer, read, key);
-        _send_encoded_key(buffer, socket);
+        _send_encoded_key(buffer, read, socket);
         offset += read;
     } while (read == BUFFER_SIZE);
     return 0;

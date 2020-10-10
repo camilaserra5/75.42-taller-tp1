@@ -24,7 +24,7 @@ int server(const char *port, char* method, char* key) {
     while (cont != 0) {
         cont = protocol_server_receive(&protocol, 64);
         char* buffer = protocol_get_message(&protocol);
-        cesar_decode(buffer, cont, key);
+        cesar_decode(buffer, strlen(buffer), key);
         printf("%s", buffer);
     }
 
