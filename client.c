@@ -6,13 +6,13 @@
 #include "common_protocol.h"
 #include "common_cesar.h"
 #include "common_rivest.h"
-#include "common_vigenere.h"
+
 #define BUFFER_SIZE 64
 
 static const char *ERROR_UNSUPPORTED = "No se reconoce el comando ingresado\n";
 static const char *INVALID_USE_CLIENT = "Uso: ./tp client <host> <puerto> --method=<method> --key=<key>\n";
 
-static bool _send_encoded_key(char* key, int len, socket_t socket) {
+static bool _send_encoded_key(char *key, int len, socket_t socket) {
     protocol_t protocol;
     protocol_init(&protocol, &socket);
 
@@ -22,7 +22,7 @@ static bool _send_encoded_key(char* key, int len, socket_t socket) {
     return 1;
 }
 
-int read_and_send(void (*func)(char *, int, char*), char* key, socket_t socket){
+int read_and_send(void (*func)(char *, int, char *), char *key, socket_t socket) {
     char buffer[BUFFER_SIZE];
     int read, offset = 0;
 
@@ -35,14 +35,14 @@ int read_and_send(void (*func)(char *, int, char*), char* key, socket_t socket){
     return 0;
 }
 
-int client(char *host, char *port, char* method, char* key) {
+int client(char *host, char *port, char *method, char *key) {
     socket_t socket;
     socket_init(&socket, host, port);
     socket_connect(&socket);
 
     int res = 1;
 
-    void (*func)(char*, int, char*);
+    void (*func)(char *, int, char *);
 
     if (strncmp("cesar", method, 5) == 0) {
         func = &cesar_encode;
@@ -65,18 +65,18 @@ int client(char *host, char *port, char* method, char* key) {
 
 int main(int argc, char *argv[]) {
     int res = 1;
-    char * separator = "=";
+    char *separator = "=";
 
     if (argc < 5) {
         printf("%s", INVALID_USE_CLIENT);
         return 1;
     }
 
-    char* method = strtok(argv[3], separator);
-    method = strtok(NULL,separator);
+    char *method = strtok(argv[3], separator);
+    method = strtok(NULL, separator);
 
-    char* key = strtok(argv[4], separator);
-    key = strtok(NULL,separator);
+    char *key = strtok(argv[4], separator);
+    key = strtok(NULL, separator);
 
     res = client(argv[1], argv[2], method, key);
 

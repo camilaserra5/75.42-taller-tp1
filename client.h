@@ -4,6 +4,6 @@
 #include <stdio.h>
 #include <string.h>
 
-int client(char *host, char *port, char* method, char* key);
+int client(char *host, char *port, char *method, char *key);
 
 #endif
