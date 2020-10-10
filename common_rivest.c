@@ -1,39 +1,51 @@
 #include <string.h>
+#include "stdio.h"
 
-void rivest_encode(char *message, int len, char *key) {
-    unsigned char test;
-    int keyLen = strlen(key), i, j;
-    char newKey[len];
-    for (i = 0, j = 0; i < len; ++i, ++j) {
-        if (j == keyLen)
-            j = 0;
-        newKey[i] = key[j];
-    }
-    newKey[i] = '\0';
-
-    for (i = 0; i < len; ++i) {
-        test = message[i];
-        test = (test + newKey[i]) % 256;
-        message[i] = test;
-    }
-    message[i] = '\0';
+void swap(unsigned char *a, unsigned char *b) {
+    int tmp = *a;
+    *a = *b;
+    *b = tmp;
 }
 
-void rivest_decode(char *message, int len, char *key) {
-    unsigned char test;
-    int keyLen = strlen(key), i, j;
-    char newKey[len];
-    for (i = 0, j = 0; i < len; ++i, ++j) {
-        if (j == keyLen)
-            j = 0;
-        newKey[i] = key[j];
-    }
-    newKey[i] = '\0';
+// key scheduling algorithm
+void KSA(char *key, unsigned char *S) {
+    int len = strlen(key);
+    for (int i = 0; i < 256; i++)
+        S[i] = i;
 
-    for (i = 0; i < len; ++i) {
-        test = message[i];
-        test = (test - newKey[i]) % 256;
-        message[i] = test;
+    int j = 0;
+    for (int i = 0; i < 256; i++) {
+        j = (j + S[i] + key[i % len]) % 256;
+        swap(&S[i], &S[j]);
     }
-    message[i] = '\0';
+}
+
+// pseudo random generation algorithm
+void PRGA(unsigned char *S, char *message, int len) {
+    int i = 0;
+    int j = 0;
+
+    for (int n = 0; n < len; n++) {
+        i = (i + 1) % 256;
+        j = (j + S[i]) % 256;
+        swap(&S[i], &S[j]);
+        int temp = S[(S[i] + S[j]) % 256];
+        message[n] = temp ^ message[n];
+    }
+}
+
+void rivest_encode(char *message, int len, char *key) {
+    unsigned char S[256];
+    KSA(key, S);
+
+    PRGA(S, message, len);
+
+    printf("%s", message);
+}
+
+void rivest_decode(char *message, int message_len, char *key) {
+    unsigned char S[256];
+    KSA(key, S);
+
+    PRGA(S, message);
 }

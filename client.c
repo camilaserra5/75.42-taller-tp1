@@ -6,6 +6,7 @@
 #include "common_protocol.h"
 #include "common_cesar.h"
 #include "common_rivest.h"
+#include "common_vigenere.h"
 
 #define BUFFER_SIZE 64
 
@@ -47,7 +48,7 @@ int client(char *host, char *port, char *method, char *key) {
     if (strncmp("cesar", method, 5) == 0) {
         func = &cesar_encode;
     } else if (strncmp("vigenere", method, 8) == 0) {
-        func = &cesar_encode;
+        func = &vigenere_encode;
     } else if (strncmp("rc4", method, 3) == 0) {
         func = &rivest_encode;
     } else {
