@@ -6,7 +6,8 @@
 #include "common_rivest.h"
 #include "common_vigenere.h"
 
-static const char *INVALID_USE_SERVER = "Uso: ./tp server <puerto> --method=<method> --key=<key>\n";
+static const char *INVALID_USE_SERVER = "Uso: ./tp server <puerto> "
+                                        "--method=<method> --key=<key>\n";
 
 static socket_t _get_socket(const char *port) {
     socket_t socket;

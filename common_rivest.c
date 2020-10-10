@@ -39,13 +39,11 @@ void rivest_encode(char *message, int len, char *key) {
     KSA(key, S);
 
     PRGA(S, message, len);
-
-    printf("%s", message);
 }
 
-void rivest_decode(char *message, int message_len, char *key) {
+void rivest_decode(char *message, int len, char *key) {
     unsigned char S[256];
     KSA(key, S);
 
-    PRGA(S, message);
+    PRGA(S, message, len);
 }

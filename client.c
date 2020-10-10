@@ -11,7 +11,8 @@
 #define BUFFER_SIZE 64
 
 static const char *ERROR_UNSUPPORTED = "No se reconoce el comando ingresado\n";
-static const char *INVALID_USE_CLIENT = "Uso: ./tp client <host> <puerto> --method=<method> --key=<key>\n";
+static const char *INVALID_USE_CLIENT = "Uso: ./tp client <host> <puerto> "
+                                        "--method=<method> --key=<key>\n";
 
 static bool _send_encoded_key(char *key, int len, socket_t socket) {
     protocol_t protocol;
@@ -23,7 +24,8 @@ static bool _send_encoded_key(char *key, int len, socket_t socket) {
     return 1;
 }
 
-int read_and_send(void (*func)(char *, int, char *), char *key, socket_t socket) {
+int read_and_send(void (*func)(char *, int, char *), char *key,
+                  socket_t socket) {
     char buffer[BUFFER_SIZE];
     int read, offset = 0;
 
