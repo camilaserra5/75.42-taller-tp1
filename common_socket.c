@@ -68,7 +68,7 @@ int socket_receive(socket_t *socket, char *buffer, size_t size) {
 
     while (total < size) {
         bytes_written = recv(socket->fd, &buffer[total], size - total, 0);
-        if (bytes_written <= 0) {
+        if (bytes_written == 0) {
             return 0;
         }
         total += bytes_written;

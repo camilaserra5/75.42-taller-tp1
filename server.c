@@ -1,3 +1,5 @@
+#define _GNU_SOURCE
+
 #include "common_socket.h"
 #include "common_protocol.h"
 #include <stdio.h>
@@ -57,11 +59,14 @@ int main(int argc, char *argv[]) {
         return 1;
     }
     char *separator = "=";
-    char *method = strtok(argv[2], separator);
-    method = strtok(NULL, separator);
 
-    char *key = strtok(argv[3], separator);
-    key = strtok(NULL, separator);
+    char *saveptr;
+    strtok_r(argv[2], separator, &saveptr);
+    char *method = strtok_r(NULL, separator, &saveptr);
+
+    char *saveptrkey;
+    strtok_r(argv[3], separator, &saveptrkey);
+    char *key = strtok_r(NULL, separator, &saveptrkey);
 
     res = server(argv[1], method, key);
 

@@ -27,13 +27,12 @@ static bool _send_encoded_key(char *key, int len, socket_t socket) {
 int read_and_send(void (*func)(char *, int, char *), char *key,
                   socket_t socket) {
     char buffer[BUFFER_SIZE];
-    int read, offset = 0;
+    int read;
 
     do {
         read = fread(buffer, sizeof(char), BUFFER_SIZE, stdin);
         (*func)(buffer, read, key);
         _send_encoded_key(buffer, read, socket);
-        offset += read;
     } while (read == BUFFER_SIZE);
     return 0;
 }
@@ -74,12 +73,13 @@ int main(int argc, char *argv[]) {
         printf("%s", INVALID_USE_CLIENT);
         return 1;
     }
+    char *saveptr;
+    strtok_r(argv[3], separator, &saveptr);
+    char *method = strtok_r(NULL, separator, &saveptr);
 
-    char *method = strtok(argv[3], separator);
-    method = strtok(NULL, separator);
-
-    char *key = strtok(argv[4], separator);
-    key = strtok(NULL, separator);
+    char *saveptrkey;
+    strtok_r(argv[4], separator, &saveptrkey);
+    char *key = strtok_r(NULL, separator, &saveptrkey);
 
     res = client(argv[1], argv[2], method, key);
 
