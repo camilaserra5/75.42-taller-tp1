@@ -63,11 +63,11 @@ bool socket_listen(socket_t *socket) {
 }
 
 int socket_receive(socket_t *socket, char *buffer, size_t size) {
-    size_t bytes_written = 0;
     int total = 0;
 
     while (total < size) {
-        bytes_written = recv(socket->fd, &buffer[total], size - total, 0);
+        size_t bytes_written = recv(socket->fd, &buffer[total],
+                                    size - total, 0);
         if (bytes_written == 0) {
             return 0;
         }
