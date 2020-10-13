@@ -1,6 +1,6 @@
 #include <stdlib.h>
 
-void cesar_encode(char *message, int len, char *key) {
+void cesar_encode(char *message, int len, char *key, int offset) {
     for (int i = 0; i < len; i++) {
         unsigned char temp;
         temp = message[i];
@@ -9,7 +9,7 @@ void cesar_encode(char *message, int len, char *key) {
     }
 }
 
-void cesar_decode(char *message, int len, char *key) {
+void cesar_decode(char *message, int len, char *key, int offset) {
     for (int i = 0; i < len; i++) {
         unsigned char temp;
         temp = message[i];

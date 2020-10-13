@@ -74,7 +74,7 @@ int socket_receive(socket_t *socket, char *buffer, size_t size) {
         total += bytes_written;
     }
 
-    return bytes_written;
+    return total;
 }
 
 int socket_send(socket_t *socket, const char *buffer, size_t size) {

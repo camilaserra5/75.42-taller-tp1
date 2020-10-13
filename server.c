@@ -25,7 +25,7 @@ int server(const char *port, char *method, char *key) {
     protocol_t protocol;
     protocol_init(&protocol, &socket);
 
-    void (*func)(char *, int, char *);
+    void (*func)(char *, int, char *, int);
 
     if (strncmp("cesar", method, 5) == 0) {
         func = &cesar_decode;
@@ -38,11 +38,13 @@ int server(const char *port, char *method, char *key) {
     }
 
     int cont = 1;
+    int offset = 0;
     while (cont != 0) {
         cont = protocol_server_receive(&protocol, 64);
         char *buffer = protocol_get_message(&protocol);
-        (*func)(buffer, strlen(buffer), key);
+        (*func)(buffer, strlen(buffer), key, offset);
         printf("%s", buffer);
+        offset += cont;
     }
 
     protocol_destroy(&protocol);
