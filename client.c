@@ -24,7 +24,7 @@ static bool _send_encoded_key(char *key, int len, socket_t socket) {
     return 1;
 }
 
-int read_and_send(void (*func)(char *, int, const char *, int), char *key,
+int _read_and_send(void (*func)(char *, int, const char *, int), char *key,
                   socket_t socket) {
     char buffer[BUFFER_SIZE];
     int read;
@@ -39,7 +39,7 @@ int read_and_send(void (*func)(char *, int, const char *, int), char *key,
     return 0;
 }
 
-int client(char *host, char *port, char *method, char *key) {
+int _client(char *host, char *port, char *method, char *key) {
     socket_t socket;
     socket_init(&socket, host, port);
     socket_connect(&socket);
@@ -60,7 +60,7 @@ int client(char *host, char *port, char *method, char *key) {
         return res;
     }
 
-    read_and_send(func, key, socket);
+    _read_and_send(func, key, socket);
 
     socket_destroy(&socket);
 
@@ -68,13 +68,13 @@ int client(char *host, char *port, char *method, char *key) {
 }
 
 int main(int argc, char *argv[]) {
-    int res = 1;
     char *separator = "=";
 
     if (argc < 5) {
         printf("%s", INVALID_USE_CLIENT);
-        return 1;
+        return 0;
     }
+
     char *saveptr;
     strtok_r(argv[3], separator, &saveptr);
     char *method = strtok_r(NULL, separator, &saveptr);
@@ -83,7 +83,7 @@ int main(int argc, char *argv[]) {
     strtok_r(argv[4], separator, &saveptrkey);
     char *key = strtok_r(NULL, separator, &saveptrkey);
 
-    res = client(argv[1], argv[2], method, key);
+    _client(argv[1], argv[2], method, key);
 
-    return res;
+    return 0;
 }

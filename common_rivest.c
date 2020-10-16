@@ -8,7 +8,7 @@ void swap(unsigned char *a, unsigned char *b) {
 
 // key scheduling algorithm
 void KSA(const char *key, unsigned char *S) {
-    int len = strlen(key);
+    int len = sizeof(key);
     for (int i = 0; i < 256; i++)
         S[i] = i;
 

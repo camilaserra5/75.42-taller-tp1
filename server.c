@@ -21,7 +21,7 @@ static socket_t _get_socket(const char *port) {
     return socket;
 }
 
-int server(const char *port, const char *method, const char *key) {
+int _server(const char *port, const char *method, const char *key) {
     socket_t socket = _get_socket(port);
     protocol_t protocol;
     protocol_init(&protocol, &socket);
@@ -38,9 +38,9 @@ int server(const char *port, const char *method, const char *key) {
         return 1;
     }
 
-    int cont = 64;
+    int cont = BUFFER_SIZE;
     int offset = 0;
-    while (cont == 64) {
+    while (cont == BUFFER_SIZE) {
         cont = protocol_server_receive(&protocol, BUFFER_SIZE);
         char *buffer = protocol_get_message(&protocol);
         (*func)(buffer, cont, key, offset);
@@ -55,12 +55,11 @@ int server(const char *port, const char *method, const char *key) {
 }
 
 int main(int argc, char *argv[]) {
-    int res = 1;
-
     if (argc < 4) {
         printf("%s", INVALID_USE_SERVER);
-        return 1;
+        return 0;
     }
+
     char *separator = "=";
 
     char *saveptr;
@@ -71,7 +70,7 @@ int main(int argc, char *argv[]) {
     strtok_r(argv[3], separator, &saveptrkey);
     char *key = strtok_r(NULL, separator, &saveptrkey);
 
-    res = server(argv[1], method, key);
+    _server(argv[1], method, key);
 
-    return res;
+    return 0;
 }
