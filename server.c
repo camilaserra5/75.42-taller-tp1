@@ -25,7 +25,7 @@ static socket_t _get_socket(const char *port) {
     return socket;
 }
 
-void _read_and_decode(protocol_t* protocol, const char *key, decoder_t decoder) {
+void _read_and_decode(protocol_t *protocol, const char *key, decoder_t decoder) {
     int cont = BUFFER_SIZE;
     int offset = 0;
     while (cont == BUFFER_SIZE) {
