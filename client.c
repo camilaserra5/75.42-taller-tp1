@@ -14,7 +14,7 @@ static const char *ERROR_UNSUPPORTED = "No se reconoce el método ingresado\n";
 static const char *INVALID_USE_CLIENT = "Uso: ./tp client <host> <puerto> "
                                         "--method=<method> --key=<key>\n";
 
-void _send_encoded_key(char *key, int len, socket_t socket) {
+void _send_encoded(char *key, int len, socket_t socket) {
     protocol_t protocol;
     protocol_init(&protocol, &socket);
 
@@ -23,8 +23,9 @@ void _send_encoded_key(char *key, int len, socket_t socket) {
     protocol_destroy(&protocol);
 }
 
-void _read_and_send(void (*func)(char *, int, const char *, int), char *key,
-                   socket_t socket) {
+void _read_and_encode(void (*func)(char *, int, const char *, int),
+                      const char *key,
+                      socket_t socket) {
     char buffer[BUFFER_SIZE];
     int read;
     int offset = 0;
@@ -32,12 +33,12 @@ void _read_and_send(void (*func)(char *, int, const char *, int), char *key,
     do {
         read = fread(buffer, sizeof(char), BUFFER_SIZE, stdin);
         (*func)(buffer, read, key, offset);
-        _send_encoded_key(buffer, read, socket);
+        _send_encoded(buffer, read, socket);
         offset += read;
     } while (read == BUFFER_SIZE);
 }
 
-void _client(char *host, char *port, char *method, char *key) {
+void _client(const char *host, const char *port, const char *method, const char *key) {
     socket_t socket;
     socket_init(&socket, host, port);
     socket_connect(&socket);
@@ -55,7 +56,7 @@ void _client(char *host, char *port, char *method, char *key) {
         return;
     }
 
-    _read_and_send(func, key, socket);
+    _read_and_encode(func, key, socket);
 
     socket_destroy(&socket);
 }

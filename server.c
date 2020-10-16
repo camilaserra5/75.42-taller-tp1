@@ -61,7 +61,6 @@ void _server(const char *port, const char *method, const char *key) {
 
 int main(int argc, char *argv[]) {
     char *separator = "=";
-
     if (argc < 4) {
         printf("%s", INVALID_USE_SERVER);
         return 0;
