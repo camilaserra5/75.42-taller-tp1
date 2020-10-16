@@ -14,17 +14,16 @@ static const char *ERROR_UNSUPPORTED = "No se reconoce el método ingresado\n";
 static const char *INVALID_USE_CLIENT = "Uso: ./tp client <host> <puerto> "
                                         "--method=<method> --key=<key>\n";
 
-static bool _send_encoded_key(char *key, int len, socket_t socket) {
+void _send_encoded_key(char *key, int len, socket_t socket) {
     protocol_t protocol;
     protocol_init(&protocol, &socket);
 
     protocol_client_send(&protocol, key, len);
 
     protocol_destroy(&protocol);
-    return 1;
 }
 
-int _read_and_send(void (*func)(char *, int, const char *, int), char *key,
+void _read_and_send(void (*func)(char *, int, const char *, int), char *key,
                    socket_t socket) {
     char buffer[BUFFER_SIZE];
     int read;
@@ -36,15 +35,12 @@ int _read_and_send(void (*func)(char *, int, const char *, int), char *key,
         _send_encoded_key(buffer, read, socket);
         offset += read;
     } while (read == BUFFER_SIZE);
-    return 0;
 }
 
-int _client(char *host, char *port, char *method, char *key) {
+void _client(char *host, char *port, char *method, char *key) {
     socket_t socket;
     socket_init(&socket, host, port);
     socket_connect(&socket);
-
-    int res = 1;
 
     void (*func)(char *, int, const char *, int);
 
@@ -56,15 +52,12 @@ int _client(char *host, char *port, char *method, char *key) {
         func = &rivest_encode;
     } else {
         printf("%s", ERROR_UNSUPPORTED);
-        res = 1;
-        return res;
+        return;
     }
 
     _read_and_send(func, key, socket);
 
     socket_destroy(&socket);
-
-    return res;
 }
 
 int main(int argc, char *argv[]) {
@@ -75,13 +68,13 @@ int main(int argc, char *argv[]) {
         return 0;
     }
 
-    char *saveptr;
-    strtok_r(argv[3], separator, &saveptr);
-    char *method = strtok_r(NULL, separator, &saveptr);
+    char *saveptr_method;
+    strtok_r(argv[3], separator, &saveptr_method);
+    char *method = strtok_r(NULL, separator, &saveptr_method);
 
-    char *saveptrkey;
-    strtok_r(argv[4], separator, &saveptrkey);
-    char *key = strtok_r(NULL, separator, &saveptrkey);
+    char *saveptr_key;
+    strtok_r(argv[4], separator, &saveptr_key);
+    char *key = strtok_r(NULL, separator, &saveptr_key);
 
     _client(argv[1], argv[2], method, key);
 

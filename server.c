@@ -9,6 +9,7 @@
 #include "common_vigenere.h"
 
 #define BUFFER_SIZE 64
+static const char *ERROR_UNSUPPORTED = "No se reconoce el método ingresado\n";
 static const char *INVALID_USE_SERVER = "Uso: ./tp server <puerto> "
                                         "--method=<method> --key=<key>\n";
 
@@ -21,54 +22,58 @@ static socket_t _get_socket(const char *port) {
     return socket;
 }
 
-int _server(const char *port, const char *method, const char *key) {
-    socket_t socket = _get_socket(port);
-    protocol_t protocol;
-    protocol_init(&protocol, &socket);
-
-    void (*func)(char *, int, const char *, int);
-
-    if (strncmp(CESAR, method, 5) == 0) {
-        func = &cesar_decode;
-    } else if (strncmp(VIGENERE, method, 8) == 0) {
-        func = &vigenere_decode;
-    } else if (strncmp(RC4, method, 3) == 0) {
-        func = &rivest_decode;
-    } else {
-        return 1;
-    }
-
+void _read_and_decode(protocol_t protocol,
+                      const char *key,
+                      void (*decoder)(char *, int, const char *, int)) {
     int cont = BUFFER_SIZE;
     int offset = 0;
     while (cont == BUFFER_SIZE) {
         cont = protocol_server_receive(&protocol, BUFFER_SIZE);
         char *buffer = protocol_get_message(&protocol);
-        (*func)(buffer, cont, key, offset);
+        (*decoder)(buffer, cont, key, offset);
         printf("%s", buffer);
         offset += cont;
     }
+}
+
+void _server(const char *port, const char *method, const char *key) {
+    socket_t socket = _get_socket(port);
+    protocol_t protocol;
+    protocol_init(&protocol, &socket);
+
+    void (*decoder)(char *, int, const char *, int);
+    if (strncmp(CESAR, method, 5) == 0) {
+        decoder = &cesar_decode;
+    } else if (strncmp(VIGENERE, method, 8) == 0) {
+        decoder = &vigenere_decode;
+    } else if (strncmp(RC4, method, 3) == 0) {
+        decoder = &rivest_decode;
+    } else {
+        printf("%s", ERROR_UNSUPPORTED);
+        return;
+    }
+
+    _read_and_decode(protocol, key, decoder);
 
     protocol_destroy(&protocol);
     socket_destroy(&socket);
-
-    return cont;
 }
 
 int main(int argc, char *argv[]) {
+    char *separator = "=";
+
     if (argc < 4) {
         printf("%s", INVALID_USE_SERVER);
         return 0;
     }
 
-    char *separator = "=";
+    char *saveptr_method;
+    strtok_r(argv[2], separator, &saveptr_method);
+    char *method = strtok_r(NULL, separator, &saveptr_method);
 
-    char *saveptr;
-    strtok_r(argv[2], separator, &saveptr);
-    char *method = strtok_r(NULL, separator, &saveptr);
-
-    char *saveptrkey;
-    strtok_r(argv[3], separator, &saveptrkey);
-    char *key = strtok_r(NULL, separator, &saveptrkey);
+    char *saveptr_key;
+    strtok_r(argv[3], separator, &saveptr_key);
+    char *key = strtok_r(NULL, separator, &saveptr_key);
 
     _server(argv[1], method, key);
 
