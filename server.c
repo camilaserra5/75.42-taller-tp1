@@ -13,6 +13,8 @@ static const char *ERROR_UNSUPPORTED = "No se reconoce el método ingresado\n";
 static const char *INVALID_USE_SERVER = "Uso: ./tp server <puerto> "
                                         "--method=<method> --key=<key>\n";
 
+typedef void (*decoder_t)(char *, int, const char *, int);
+
 static socket_t _get_socket(const char *port) {
     socket_t socket;
     socket_init(&socket, NULL, port);
@@ -22,9 +24,7 @@ static socket_t _get_socket(const char *port) {
     return socket;
 }
 
-void _read_and_decode(protocol_t protocol,
-                      const char *key,
-                      void (*decoder)(char *, int, const char *, int)) {
+void _read_and_decode(protocol_t protocol, const char *key, decoder_t decoder) {
     int cont = BUFFER_SIZE;
     int offset = 0;
     while (cont == BUFFER_SIZE) {
@@ -36,12 +36,8 @@ void _read_and_decode(protocol_t protocol,
     }
 }
 
-void _server(const char *port, const char *method, const char *key) {
-    socket_t socket = _get_socket(port);
-    protocol_t protocol;
-    protocol_init(&protocol, &socket);
-
-    void (*decoder)(char *, int, const char *, int);
+decoder_t _get_decoder_function(const char *method) {
+    decoder_t decoder;
     if (strncmp(CESAR, method, 5) == 0) {
         decoder = &cesar_decode;
     } else if (strncmp(VIGENERE, method, 8) == 0) {
@@ -50,9 +46,17 @@ void _server(const char *port, const char *method, const char *key) {
         decoder = &rivest_decode;
     } else {
         printf("%s", ERROR_UNSUPPORTED);
-        return;
+        return NULL;
     }
+    return decoder;
+}
 
+void _server(const char *port, const char *method, const char *key) {
+    socket_t socket = _get_socket(port);
+    protocol_t protocol;
+    protocol_init(&protocol, &socket);
+
+    decoder_t decoder = _get_decoder_function(method);
     _read_and_decode(protocol, key, decoder);
 
     protocol_destroy(&protocol);

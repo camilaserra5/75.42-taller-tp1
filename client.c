@@ -10,6 +10,8 @@
 
 #define BUFFER_SIZE 64
 
+typedef void (*encoder_t)(char *, int, const char *, int);
+
 static const char *ERROR_UNSUPPORTED = "No se reconoce el método ingresado\n";
 static const char *INVALID_USE_CLIENT = "Uso: ./tp client <host> <puerto> "
                                         "--method=<method> --key=<key>\n";
@@ -23,9 +25,7 @@ void _send_encoded(char *key, int len, socket_t socket) {
     protocol_destroy(&protocol);
 }
 
-void _read_and_encode(void (*encoder)(char *, int, const char *, int),
-                      const char *key,
-                      socket_t socket) {
+void _read_and_encode(encoder_t encoder, const char *key, socket_t socket) {
     char buffer[BUFFER_SIZE];
     int read;
     int offset = 0;
@@ -38,12 +38,8 @@ void _read_and_encode(void (*encoder)(char *, int, const char *, int),
     } while (read == BUFFER_SIZE);
 }
 
-void _client(const char *host, const char *port, const char *method, const char *key) {
-    socket_t socket;
-    socket_init(&socket, host, port);
-    socket_connect(&socket);
-
-    void (*encoder)(char *, int, const char *, int);
+encoder_t _get_encoder_function(const char *method) {
+    encoder_t encoder;
     if (strncmp(CESAR, method, 5) == 0) {
         encoder = &cesar_encode;
     } else if (strncmp(VIGENERE, method, 8) == 0) {
@@ -52,9 +48,18 @@ void _client(const char *host, const char *port, const char *method, const char 
         encoder = &rivest_encode;
     } else {
         printf("%s", ERROR_UNSUPPORTED);
-        return;
+        return NULL;
     }
+    return encoder;
+}
 
+void _client(const char *host, const char *port,
+             const char *method, const char *key) {
+    socket_t socket;
+    socket_init(&socket, host, port);
+    socket_connect(&socket);
+
+    encoder_t encoder = _get_encoder_function(method);
     _read_and_encode(encoder, key, socket);
 
     socket_destroy(&socket);
@@ -62,7 +67,6 @@ void _client(const char *host, const char *port, const char *method, const char 
 
 int main(int argc, char *argv[]) {
     char *separator = "=";
-
     if (argc < 5) {
         printf("%s", INVALID_USE_CLIENT);
         return 0;
