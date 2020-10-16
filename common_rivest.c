@@ -1,5 +1,4 @@
 #include <string.h>
-#include "stdio.h"
 
 void swap(unsigned char *a, unsigned char *b) {
     int tmp = *a;
@@ -8,7 +7,7 @@ void swap(unsigned char *a, unsigned char *b) {
 }
 
 // key scheduling algorithm
-void KSA(char *key, unsigned char *S) {
+void KSA(const char *key, unsigned char *S) {
     int len = strlen(key);
     for (int i = 0; i < 256; i++)
         S[i] = i;
@@ -40,14 +39,14 @@ void PRGA(unsigned char *S, char *message, int len, int offset) {
     }
 }
 
-void rivest_encode(char *message, int len, char *key, int offset) {
+void rivest_encode(char *message, int len, const char *key, int offset) {
     unsigned char S[256];
     KSA(key, S);
 
     PRGA(S, message, len, offset);
 }
 
-void rivest_decode(char *message, int len, char *key, int offset) {
+void rivest_decode(char *message, int len, const char *key, int offset) {
     unsigned char S[256];
     KSA(key, S);
 

@@ -24,7 +24,7 @@ static bool _send_encoded_key(char *key, int len, socket_t socket) {
     return 1;
 }
 
-int read_and_send(void (*func)(char *, int, char *, int), char *key,
+int read_and_send(void (*func)(char *, int, const char *, int), char *key,
                   socket_t socket) {
     char buffer[BUFFER_SIZE];
     int read;
@@ -46,7 +46,7 @@ int client(char *host, char *port, char *method, char *key) {
 
     int res = 1;
 
-    void (*func)(char *, int, char *, int);
+    void (*func)(char *, int, const char *, int);
 
     if (strncmp("cesar", method, 5) == 0) {
         func = &cesar_encode;

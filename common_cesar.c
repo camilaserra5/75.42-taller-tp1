@@ -1,19 +1,14 @@
 #include <stdlib.h>
 
-void cesar_encode(char *message, int len, char *key, int offset) {
+
+void cesar_encode(char *message, int len, const char *key, int offset) {
     for (int i = 0; i < len; i++) {
-        unsigned char temp;
-        temp = message[i];
-        temp = (temp + atoi(key)) % 256;
-        message[i] = temp;
+        message[i] = (message[i] + atoi(key)) % 256;
     }
 }
 
-void cesar_decode(char *message, int len, char *key, int offset) {
+void cesar_decode(char *message, int len, const char *key, int offset) {
     for (int i = 0; i < len; i++) {
-        unsigned char temp;
-        temp = message[i];
-        temp = (temp - atoi(key)) % 256;
-        message[i] = temp;
+        message[i] = (message[i] - atoi(key)) % 256;
     }
 }

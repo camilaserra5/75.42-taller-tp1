@@ -7,7 +7,7 @@
 #include "common_cesar.h"
 #include "common_rivest.h"
 #include "common_vigenere.h"
-
+#define BUFFER_SIZE 64
 static const char *INVALID_USE_SERVER = "Uso: ./tp server <puerto> "
                                         "--method=<method> --key=<key>\n";
 
@@ -20,12 +20,12 @@ static socket_t _get_socket(const char *port) {
     return socket;
 }
 
-int server(const char *port, char *method, char *key) {
+int server(const char *port, const char *method, const char *key) {
     socket_t socket = _get_socket(port);
     protocol_t protocol;
     protocol_init(&protocol, &socket);
 
-    void (*func)(char *, int, char *, int);
+    void (*func)(char *, int, const char *, int);
 
     if (strncmp("cesar", method, 5) == 0) {
         func = &cesar_decode;
@@ -40,7 +40,7 @@ int server(const char *port, char *method, char *key) {
     int cont = 64;
     int offset = 0;
     while (cont == 64) {
-        cont = protocol_server_receive(&protocol, 64);
+        cont = protocol_server_receive(&protocol, BUFFER_SIZE);
         char *buffer = protocol_get_message(&protocol);
         (*func)(buffer, cont, key, offset);
         printf("%s", buffer);
