@@ -10,7 +10,7 @@
 
 #define BUFFER_SIZE 64
 
-static const char *ERROR_UNSUPPORTED = "No se reconoce el comando ingresado\n";
+static const char *ERROR_UNSUPPORTED = "No se reconoce el método ingresado\n";
 static const char *INVALID_USE_CLIENT = "Uso: ./tp client <host> <puerto> "
                                         "--method=<method> --key=<key>\n";
 
@@ -25,7 +25,7 @@ static bool _send_encoded_key(char *key, int len, socket_t socket) {
 }
 
 int _read_and_send(void (*func)(char *, int, const char *, int), char *key,
-                  socket_t socket) {
+                   socket_t socket) {
     char buffer[BUFFER_SIZE];
     int read;
     int offset = 0;
@@ -48,11 +48,11 @@ int _client(char *host, char *port, char *method, char *key) {
 
     void (*func)(char *, int, const char *, int);
 
-    if (strncmp("cesar", method, 5) == 0) {
+    if (strncmp(CESAR, method, 5) == 0) {
         func = &cesar_encode;
-    } else if (strncmp("vigenere", method, 8) == 0) {
+    } else if (strncmp(VIGENERE, method, 8) == 0) {
         func = &vigenere_encode;
-    } else if (strncmp("rc4", method, 3) == 0) {
+    } else if (strncmp(RC4, method, 3) == 0) {
         func = &rivest_encode;
     } else {
         printf("%s", ERROR_UNSUPPORTED);

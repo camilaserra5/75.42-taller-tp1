@@ -28,11 +28,11 @@ int _server(const char *port, const char *method, const char *key) {
 
     void (*func)(char *, int, const char *, int);
 
-    if (strncmp("cesar", method, 5) == 0) {
+    if (strncmp(CESAR, method, 5) == 0) {
         func = &cesar_decode;
-    } else if (strncmp("vigenere", method, 8) == 0) {
+    } else if (strncmp(VIGENERE, method, 8) == 0) {
         func = &vigenere_decode;
-    } else if (strncmp("rc4", method, 3) == 0) {
+    } else if (strncmp(RC4, method, 3) == 0) {
         func = &rivest_decode;
     } else {
         return 1;
