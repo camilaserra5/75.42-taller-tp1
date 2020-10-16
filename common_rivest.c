@@ -1,5 +1,3 @@
-#include <string.h>
-
 void swap(unsigned char *a, unsigned char *b) {
     int tmp = *a;
     *a = *b;
@@ -34,7 +32,6 @@ void PRGA(unsigned char *S, char *message, int length, int offset) {
         j = (j + S[i]) % 256;
         swap(&S[i], &S[j]);
         int temp = S[(S[i] + S[j]) % 256];
-
         message[n] = temp ^ message[n];
     }
 }
@@ -42,13 +39,11 @@ void PRGA(unsigned char *S, char *message, int length, int offset) {
 void rivest_encode(char *message, int length, const char *key, int offset) {
     unsigned char S[256];
     KSA(key, S);
-
     PRGA(S, message, length, offset);
 }
 
 void rivest_decode(char *message, int length, const char *key, int offset) {
     unsigned char S[256];
     KSA(key, S);
-
     PRGA(S, message, length, offset);
 }
