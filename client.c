@@ -32,7 +32,7 @@ int read_and_send(void (*func)(char *, int, const char *, int), char *key,
 
     do {
         read = fread(buffer, sizeof(char), BUFFER_SIZE, stdin);
-         (*func)(buffer, read, key, offset);
+        (*func)(buffer, read, key, offset);
         _send_encoded_key(buffer, read, socket);
         offset += read;
     } while (read == BUFFER_SIZE);

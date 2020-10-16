@@ -7,6 +7,7 @@
 #include "common_cesar.h"
 #include "common_rivest.h"
 #include "common_vigenere.h"
+
 #define BUFFER_SIZE 64
 static const char *INVALID_USE_SERVER = "Uso: ./tp server <puerto> "
                                         "--method=<method> --key=<key>\n";
