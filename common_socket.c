@@ -64,32 +64,28 @@ bool socket_listen(socket_t *socket) {
 
 int socket_receive(socket_t *socket, char *buffer, size_t size) {
     int total = 0;
-    bool cont = true;
-    while (total < size && cont) {
+    while (total < size) {
         size_t bytes_written = recv(socket->fd, &buffer[total],
                                     size - total, 0);
-        if (bytes_written == 0) {
-            //return 0;
-            cont = false;
-        }
         total += bytes_written;
+        if (bytes_written <= 0) {
+            return total;
+        }
     }
-
     return total;
 }
 
 int socket_send(socket_t *socket, const char *buffer, size_t size) {
-    int bytes_sent = 0;
     int total = 0;
     while (total < size) {
-        bytes_sent = send(socket->fd, &buffer[total], size - total, 0);
-        if (bytes_sent <= 0) {
-            return 0;
-        }
+        size_t bytes_sent = send(socket->fd, &buffer[total],
+                                 size - total, 0);
         total += bytes_sent;
+        if (bytes_sent <= 0) {
+            return total;
+        }
     }
-
-    return bytes_sent;
+    return total;
 }
 
 

@@ -20,7 +20,7 @@ void KSA(const char *key, unsigned char *S) {
 }
 
 // pseudo random generation algorithm
-void PRGA(unsigned char *S, char *message, int len, int offset) {
+void PRGA(unsigned char *S, char *message, int length, int offset) {
     int i = 0;
     int j = 0;
     for (int n = 0; n < offset; n++) {
@@ -29,7 +29,7 @@ void PRGA(unsigned char *S, char *message, int len, int offset) {
         swap(&S[i], &S[j]);
     }
 
-    for (int n = 0; n < len; n++) {
+    for (int n = 0; n < length; n++) {
         i = (i + 1) % 256;
         j = (j + S[i]) % 256;
         swap(&S[i], &S[j]);
@@ -39,16 +39,16 @@ void PRGA(unsigned char *S, char *message, int len, int offset) {
     }
 }
 
-void rivest_encode(char *message, int len, const char *key, int offset) {
+void rivest_encode(char *message, int length, const char *key, int offset) {
     unsigned char S[256];
     KSA(key, S);
 
-    PRGA(S, message, len, offset);
+    PRGA(S, message, length, offset);
 }
 
-void rivest_decode(char *message, int len, const char *key, int offset) {
+void rivest_decode(char *message, int length, const char *key, int offset) {
     unsigned char S[256];
     KSA(key, S);
 
-    PRGA(S, message, len, offset);
+    PRGA(S, message, length, offset);
 }
