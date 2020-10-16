@@ -7,7 +7,7 @@
 #include "common_cesar.h"
 #include "common_rivest.h"
 #include "common_vigenere.h"
-#include <getopt.h>
+#include "common_utils.h"
 
 #define BUFFER_SIZE 64
 
@@ -17,7 +17,9 @@ static const char *ERROR_UNSUPPORTED = "No se reconoce el método ingresado\n";
 static const char *INVALID_USE_CLIENT = "Uso: ./tp client <host> <puerto> "
                                         "--method=<method> --key=<key>\n";
 
-void _read_and_encode(encoder_t encoder, const char *key, protocol_t *protocol) {
+void _read_and_encode(encoder_t encoder,
+                      const char *key,
+                      protocol_t *protocol) {
     char buffer[BUFFER_SIZE];
     int read;
     int offset = 0;
@@ -31,16 +33,13 @@ void _read_and_encode(encoder_t encoder, const char *key, protocol_t *protocol) 
 }
 
 encoder_t _get_encoder_function(const char *method) {
-    encoder_t encoder;
+    encoder_t encoder = NULL;
     if (strncmp(CESAR, method, 5) == 0) {
         encoder = &cesar_encode;
     } else if (strncmp(VIGENERE, method, 8) == 0) {
         encoder = &vigenere_encode;
     } else if (strncmp(RC4, method, 3) == 0) {
         encoder = &rivest_encode;
-    } else {
-        printf("%s", ERROR_UNSUPPORTED);
-        return NULL;
     }
     return encoder;
 }
@@ -55,7 +54,7 @@ void _client(const char *host, const char *port,
 
     encoder_t encoder = _get_encoder_function(method);
     _read_and_encode(encoder, key, &protocol);
-    
+
     protocol_destroy(&protocol);
     socket_destroy(&socket);
 }
@@ -66,23 +65,19 @@ int main(int argc, char **argv) {
         return 0;
     }
 
-    char *method = NULL;
-    char *key = NULL;
     char *host = argv[1];
     char *port = argv[2];
-
-    static struct option long_options[] = {
-            {"method", required_argument, 0, 'm'},
-            {"key",    required_argument, 0, 'k'}
-    };
-    int c;
-    while ((c = getopt_long(argc, argv, "m:k:", long_options, NULL)) != -1) {
-        if (c == 'm') {
-            method = optarg;
-        } else if (c == 'k') {
-            key = optarg;
-        }
+    char *method = NULL, *key = NULL;
+    if (_get_method_and_key(&key, &method, argc, argv)) {
+        printf("%s", INVALID_USE_CLIENT);
+        return 0;
     }
+
+    if (_validate_method(method)) {
+        printf("%s", ERROR_UNSUPPORTED);
+        return 0;
+    }
+
     _client(host, port, method, key);
 
     return 0;

@@ -7,7 +7,7 @@
 #include "common_cesar.h"
 #include "common_rivest.h"
 #include "common_vigenere.h"
-#include <getopt.h>
+#include "common_utils.h"
 
 #define BUFFER_SIZE 64
 static const char *ERROR_UNSUPPORTED = "No se reconoce el método ingresado\n";
@@ -25,7 +25,9 @@ static socket_t _get_socket(const char *port) {
     return socket;
 }
 
-void _read_and_decode(protocol_t *protocol, const char *key, decoder_t decoder) {
+void _read_and_decode(protocol_t *protocol,
+                      const char *key,
+                      decoder_t decoder) {
     int cont = BUFFER_SIZE;
     int offset = 0;
     while (cont == BUFFER_SIZE) {
@@ -38,16 +40,13 @@ void _read_and_decode(protocol_t *protocol, const char *key, decoder_t decoder) 
 }
 
 decoder_t _get_decoder_function(const char *method) {
-    decoder_t decoder;
+    decoder_t decoder = NULL;
     if (strncmp(CESAR, method, 5) == 0) {
         decoder = &cesar_decode;
     } else if (strncmp(VIGENERE, method, 8) == 0) {
         decoder = &vigenere_decode;
     } else if (strncmp(RC4, method, 3) == 0) {
         decoder = &rivest_decode;
-    } else {
-        printf("%s", ERROR_UNSUPPORTED);
-        return NULL;
     }
     return decoder;
 }
@@ -70,21 +69,16 @@ int main(int argc, char *argv[]) {
         return 0;
     }
 
-    char *method = NULL;
-    char *key = NULL;
     char *port = argv[1];
+    char *method = NULL, *key = NULL;
+    if (_get_method_and_key(&key, &method, argc, argv)) {
+        printf("%s", INVALID_USE_SERVER);
+        return 0;
+    }
 
-    static struct option long_options[] = {
-            {"method", required_argument, 0, 'm'},
-            {"key",    required_argument, 0, 'k'}
-    };
-    int c;
-    while ((c = getopt_long(argc, argv, "m:k:", long_options, NULL)) != -1) {
-        if (c == 'm') {
-            method = optarg;
-        } else if (c == 'k') {
-            key = optarg;
-        }
+    if (_validate_method(method)) {
+        printf("%s", ERROR_UNSUPPORTED);
+        return 0;
     }
 
     _server(port, method, key);
