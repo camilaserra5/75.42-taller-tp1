@@ -64,12 +64,13 @@ bool socket_listen(socket_t *socket) {
 
 int socket_receive(socket_t *socket, char *buffer, size_t size) {
     int total = 0;
-
-    while (total < size) {
+    bool cont = true;
+    while (total < size && cont) {
         size_t bytes_written = recv(socket->fd, &buffer[total],
                                     size - total, 0);
         if (bytes_written == 0) {
-            return 0;
+            //return 0;
+            cont = false;
         }
         total += bytes_written;
     }

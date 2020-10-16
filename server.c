@@ -37,12 +37,12 @@ int server(const char *port, char *method, char *key) {
         return 1;
     }
 
-    int cont = 1;
+    int cont = 64;
     int offset = 0;
-    while (cont != 0) {
+    while (cont == 64) {
         cont = protocol_server_receive(&protocol, 64);
         char *buffer = protocol_get_message(&protocol);
-        (*func)(buffer, strlen(buffer), key, offset);
+        (*func)(buffer, cont, key, offset);
         printf("%s", buffer);
         offset += cont;
     }
