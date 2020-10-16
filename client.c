@@ -7,6 +7,7 @@
 #include "common_cesar.h"
 #include "common_rivest.h"
 #include "common_vigenere.h"
+#include <getopt.h>
 
 #define BUFFER_SIZE 64
 
@@ -65,22 +66,30 @@ void _client(const char *host, const char *port,
     socket_destroy(&socket);
 }
 
-int main(int argc, char *argv[]) {
-    char *separator = "=";
+int main(int argc, char **argv) {
     if (argc < 5) {
         printf("%s", INVALID_USE_CLIENT);
         return 0;
     }
 
-    char *saveptr_method;
-    strtok_r(argv[3], separator, &saveptr_method);
-    char *method = strtok_r(NULL, separator, &saveptr_method);
+    char *method = NULL;
+    char *key = NULL;
+    char *host = argv[1];
+    char *port = argv[2];
 
-    char *saveptr_key;
-    strtok_r(argv[4], separator, &saveptr_key);
-    char *key = strtok_r(NULL, separator, &saveptr_key);
-
-    _client(argv[1], argv[2], method, key);
+    static struct option long_options[] = {
+            {"method", required_argument, 0, 'm'},
+            {"key",    required_argument, 0, 'k'}
+    };
+    int c;
+    while ((c = getopt_long(argc, argv, "m:k:", long_options, NULL)) != -1) {
+        if (c == 'm') {
+            method = optarg;
+        } else if (c == 'k') {
+            key = optarg;
+        }
+    }
+    _client(host, port, method, key);
 
     return 0;
 }

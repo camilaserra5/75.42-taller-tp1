@@ -7,6 +7,7 @@
 #include "common_cesar.h"
 #include "common_rivest.h"
 #include "common_vigenere.h"
+#include <getopt.h>
 
 #define BUFFER_SIZE 64
 static const char *ERROR_UNSUPPORTED = "No se reconoce el método ingresado\n";
@@ -24,12 +25,12 @@ static socket_t _get_socket(const char *port) {
     return socket;
 }
 
-void _read_and_decode(protocol_t protocol, const char *key, decoder_t decoder) {
+void _read_and_decode(protocol_t* protocol, const char *key, decoder_t decoder) {
     int cont = BUFFER_SIZE;
     int offset = 0;
     while (cont == BUFFER_SIZE) {
-        cont = protocol_server_receive(&protocol, BUFFER_SIZE);
-        char *buffer = protocol_get_message(&protocol);
+        cont = protocol_server_receive(protocol, BUFFER_SIZE);
+        char *buffer = protocol_get_message(protocol);
         (*decoder)(buffer, cont, key, offset);
         printf("%s", buffer);
         offset += cont;
@@ -57,28 +58,36 @@ void _server(const char *port, const char *method, const char *key) {
     protocol_init(&protocol, &socket);
 
     decoder_t decoder = _get_decoder_function(method);
-    _read_and_decode(protocol, key, decoder);
+    _read_and_decode(&protocol, key, decoder);
 
     protocol_destroy(&protocol);
     socket_destroy(&socket);
 }
 
 int main(int argc, char *argv[]) {
-    char *separator = "=";
     if (argc < 4) {
         printf("%s", INVALID_USE_SERVER);
         return 0;
     }
 
-    char *saveptr_method;
-    strtok_r(argv[2], separator, &saveptr_method);
-    char *method = strtok_r(NULL, separator, &saveptr_method);
+    char *method = NULL;
+    char *key = NULL;
+    char *port = argv[1];
 
-    char *saveptr_key;
-    strtok_r(argv[3], separator, &saveptr_key);
-    char *key = strtok_r(NULL, separator, &saveptr_key);
+    static struct option long_options[] = {
+            {"method", required_argument, 0, 'm'},
+            {"key",    required_argument, 0, 'k'}
+    };
+    int c;
+    while ((c = getopt_long(argc, argv, "m:k:", long_options, NULL)) != -1) {
+        if (c == 'm') {
+            method = optarg;
+        } else if (c == 'k') {
+            key = optarg;
+        }
+    }
 
-    _server(argv[1], method, key);
+    _server(port, method, key);
 
     return 0;
 }
