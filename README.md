@@ -12,10 +12,10 @@ Para este trabajo se implementará un servicio de cifrado con una arquitectura d
 
 En el presente informe se detalla la solución propuesta y las diferentes pruebas realizadas para garantizar el correcto funcionamiento.
 
-- [Objetivos](#)
-- [Diseño](#)
-- [Pruebas](#)
-- [Referencias](#)
+- [Objetivos](#https://github.com/camilaserra5/75.42-taller-tp1#objetivos)
+- [Diseño](#https://github.com/camilaserra5/75.42-taller-tp1#diseño)
+- [Pruebas](#https://github.com/camilaserra5/75.42-taller-tp1#pruebas)
+- [Referencias](#https://github.com/camilaserra5/75.42-taller-tp1#referencias)
 
 ## Objetivos
 El objetivo del presente trabajo es realizar dos programas. El primer programa es un emisor (cliente) que se encarga se leer mensajes de la entrada estándar y enviarlos cifrado. El otro programa es el receptor (servidor), que se encargará de recibir los mensajes cifrados, descifralos y mostrarlos por salida estándar.
