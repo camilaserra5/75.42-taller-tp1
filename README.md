@@ -88,11 +88,9 @@ vigenere  | Secret | Lorem ipsum..
 vigenere  | queso | Pan
 vigenere  | Secret | Attack at dawn
 
-Por otro lado, se hicieron pruebas para validar más casos de uso. Los mismos se listan a continuación con una breve descripción:
+Por otro lado, se hicieron pruebas para validar más casos de uso. Se realizaron casos para probar las distintas validaciones de parámetros erroneos o incompletos
 
-1. Se realizaron casos para probar las distintas validaciones de parámetros erroneos o incompletos
-
-    a. Parámetros incompletos
+##### Parámetros incompletos
 ```bash
 ./server
 ./server 8080
@@ -116,7 +114,7 @@ Por otro lado, se hicieron pruebas para validar más casos de uso. Los mismos se
 ./client --method=cesar --key=2
 ```
 
-    b. Method o Key no encontrados
+##### Method o Key no encontrados
 ```bash
 ./server 8080 --method=cesar test
 ./server 8080 test --key=2
@@ -124,19 +122,19 @@ Por otro lado, se hicieron pruebas para validar más casos de uso. Los mismos se
 ./client localhost 8080 test --key=2
 ```
 
-    c. Puerto incorrecto
+##### Puerto incorrecto
 ```bash
 ./server test --method=cesar --key=2
 ./client localhost test --method=cesar --key=2
 ```
 
-    d. Key incorrecta
+##### Key incorrecta
 ```bash
 ./server 8080 --method=cesar --key=test
 ./client localhost 8080 --method=cesar --key=test
 ```
 
-    e. Method incorrecto
+##### Method incorrecto
 ```bash
 ./server 8080 --method=test --key=2
 ./client localhost 8080 --method=test --key=2
