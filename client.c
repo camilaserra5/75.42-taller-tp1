@@ -13,7 +13,6 @@
 
 typedef void (*encoder_t)(char *, int, const char *, int);
 
-static const char *ERROR_UNSUPPORTED = "No se reconoce el método ingresado\n";
 static const char *INVALID_USE_CLIENT = "Uso: ./tp client <host> <puerto> "
                                         "--method=<method> --key=<key>\n";
 
@@ -68,13 +67,12 @@ int main(int argc, char **argv) {
     char *host = argv[1];
     char *port = argv[2];
     char *method = NULL, *key = NULL;
-    if (_get_method_and_key(&key, &method, argc, argv)) {
+    if (get_method_and_key(&key, &method, argc, argv)) {
         printf("%s", INVALID_USE_CLIENT);
         return 0;
     }
 
-    if (_validate_method(method)) {
-        printf("%s", ERROR_UNSUPPORTED);
+    if (validate_parameters(port, key, method)) {
         return 0;
     }
 
