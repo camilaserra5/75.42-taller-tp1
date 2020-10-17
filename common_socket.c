@@ -68,7 +68,7 @@ int socket_receive(socket_t *socket, char *buffer, size_t size) {
         size_t bytes_written = recv(socket->fd, &buffer[total],
                                     size - total, 0);
         total += bytes_written;
-        if (bytes_written <= 0) {
+        if (bytes_written == 0) {
             return total;
         }
     }
@@ -81,7 +81,7 @@ int socket_send(socket_t *socket, const char *buffer, size_t size) {
         size_t bytes_sent = send(socket->fd, &buffer[total],
                                  size - total, 0);
         total += bytes_sent;
-        if (bytes_sent <= 0) {
+        if (bytes_sent == 0) {
             return total;
         }
     }
