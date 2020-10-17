@@ -52,10 +52,10 @@ int _is_numeric(const char *number) {
 }
 
 int validate_key_and_method(const char *key, const char *method) {
-    if ((strncmp(CESAR, method, 5) == 0) && (_is_numeric(key) == 0)) {
-        return 0;
+    if ((strncmp(CESAR, method, 5) == 0) && (_is_numeric(key) != 0)) {
+        return 1;
     }
-    return 1;
+    return 0;
 }
 
 int validate_port(const char *port) {
