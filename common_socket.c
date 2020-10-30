@@ -38,6 +38,8 @@ void socket_destroy(socket_t *socket) {
 
 bool socket_init(socket_t *skt, const char *host, const char *port) {
     struct addrinfo hints;
+    struct addrinfo *addr_info;
+
     memset(&hints, 0, sizeof(hints));
     hints.ai_family = AF_INET;
     hints.ai_socktype = SOCK_STREAM;
@@ -48,13 +50,18 @@ bool socket_init(socket_t *skt, const char *host, const char *port) {
     if (getaddrinfo(host, port, &hints, &skt->info) != 0) {
         return false;
     }
-    skt->fd = socket(skt->info->ai_family, skt->info->ai_socktype,
-                     skt->info->ai_protocol);
+    for (addr_info = skt->info; addr_info; addr_info = addr_info->ai_next) {
+        skt->fd = socket(addr_info->ai_family, addr_info->ai_socktype, addr_info->ai_protocol);
+        if (skt->fd < 0) {
+            continue;
+        }
+        break;
+    }
+
     if (skt->fd == ERROR_CODE) {
         freeaddrinfo(skt->info);
         return false;
     }
-
     return true;
 }
 
