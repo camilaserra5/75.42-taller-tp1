@@ -7,14 +7,11 @@
 #include "common_socket.h"
 
 bool socket_accept(socket_t *socket) {
-    int temp_fd = accept(socket->fd, NULL, NULL);
-    if (temp_fd == ERROR_CODE) {
+    socket->fd = accept(socket->fd, NULL, NULL);
+    if (socket->fd == ERROR_CODE) {
         return false;
     }
 
-    dup2(temp_fd, socket->fd);
-    close(socket->fd);
-    socket->fd = temp_fd;
     return true;
 }
 
