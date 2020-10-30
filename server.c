@@ -1,5 +1,3 @@
-#define _GNU_SOURCE
-
 #include "common_socket.h"
 #include <stdio.h>
 #include <stdlib.h>
