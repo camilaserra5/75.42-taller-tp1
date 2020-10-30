@@ -7,11 +7,8 @@
 #include "common_cesar.h"
 #include "common_rivest.h"
 #include "common_vigenere.h"
-#include "common_utils.h"
 
 #define BUFFER_SIZE 64
-static const char *INVALID_USE_SERVER = "Uso: ./tp server <puerto> "
-                                        "--method=<method> --key=<key>\n";
 
 typedef void (*decoder_t)(char *, int, const char *, int);
 
@@ -50,7 +47,7 @@ decoder_t _get_decoder_function(const char *method) {
     return decoder;
 }
 
-void _server(const char *port, const char *method, const char *key) {
+void server(const char *port, const char *method, const char *key) {
     socket_t socket = _get_socket(port);
     protocol_t protocol;
     protocol_init(&protocol, &socket);
@@ -60,26 +57,4 @@ void _server(const char *port, const char *method, const char *key) {
 
     protocol_destroy(&protocol);
     socket_destroy(&socket);
-}
-
-int main(int argc, char *argv[]) {
-    if (argc < 4) {
-        printf("%s", INVALID_USE_SERVER);
-        return 0;
-    }
-
-    char *port = argv[1];
-    char *method = NULL, *key = NULL;
-    if (get_method_and_key(&key, &method, argc, argv)) {
-        printf("%s", INVALID_USE_SERVER);
-        return 0;
-    }
-
-    if (validate_parameters(port, key, method)) {
-        return 0;
-    }
-
-    _server(port, method, key);
-
-    return 0;
 }

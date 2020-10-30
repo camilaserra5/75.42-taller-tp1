@@ -7,14 +7,10 @@
 #include "common_cesar.h"
 #include "common_rivest.h"
 #include "common_vigenere.h"
-#include "common_utils.h"
 
 #define BUFFER_SIZE 64
 
 typedef void (*encoder_t)(char *, int, const char *, int);
-
-static const char *INVALID_USE_CLIENT = "Uso: ./tp client <host> <puerto> "
-                                        "--method=<method> --key=<key>\n";
 
 void _read_and_encode(encoder_t encoder,
                       const char *key,
@@ -43,7 +39,7 @@ encoder_t _get_encoder_function(const char *method) {
     return encoder;
 }
 
-void _client(const char *host, const char *port,
+void client(const char *host, const char *port,
              const char *method, const char *key) {
     socket_t socket;
     socket_init(&socket, host, port);
@@ -56,27 +52,4 @@ void _client(const char *host, const char *port,
 
     protocol_destroy(&protocol);
     socket_destroy(&socket);
-}
-
-int main(int argc, char **argv) {
-    if (argc < 5) {
-        printf("%s", INVALID_USE_CLIENT);
-        return 0;
-    }
-
-    char *host = argv[1];
-    char *port = argv[2];
-    char *method = NULL, *key = NULL;
-    if (get_method_and_key(&key, &method, argc, argv)) {
-        printf("%s", INVALID_USE_CLIENT);
-        return 0;
-    }
-
-    if (validate_parameters(port, key, method)) {
-        return 0;
-    }
-
-    _client(host, port, method, key);
-
-    return 0;
 }
