@@ -1,8 +1,8 @@
 #define _GNU_SOURCE
 
 #include "common_socket.h"
-#include "common_protocol.h"
 #include <stdio.h>
+#include <stdlib.h>
 #include <string.h>
 #include "common_cesar.h"
 #include "common_rivest.h"
@@ -21,14 +21,18 @@ static socket_t _get_socket(const char *port) {
     return socket;
 }
 
-void _read_and_decode(protocol_t *protocol,
+void _read_and_decode(socket_t *socket,
                       const char *key,
                       decoder_t decoder) {
     int cont = BUFFER_SIZE;
     int offset = 0;
+    char* buffer = NULL;
     while (cont == BUFFER_SIZE) {
-        cont = protocol_server_receive(protocol, BUFFER_SIZE);
-        char *buffer = protocol_get_message(protocol);
+        if (buffer != NULL) {
+            free(buffer);
+        }
+        buffer = calloc(BUFFER_SIZE + 1, sizeof(char));
+        cont = socket_receive(socket, buffer, BUFFER_SIZE);
         (*decoder)(buffer, cont, key, offset);
         printf("%s", buffer);
         offset += cont;
@@ -49,12 +53,9 @@ decoder_t _get_decoder_function(const char *method) {
 
 void server(const char *port, const char *method, const char *key) {
     socket_t socket = _get_socket(port);
-    protocol_t protocol;
-    protocol_init(&protocol, &socket);
 
     decoder_t decoder = _get_decoder_function(method);
-    _read_and_decode(&protocol, key, decoder);
+    _read_and_decode(&socket, key, decoder);
 
-    protocol_destroy(&protocol);
     socket_destroy(&socket);
 }

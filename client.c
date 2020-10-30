@@ -3,7 +3,6 @@
 #include <stdio.h>
 #include <string.h>
 #include "common_socket.h"
-#include "common_protocol.h"
 #include "common_cesar.h"
 #include "common_rivest.h"
 #include "common_vigenere.h"
@@ -14,7 +13,7 @@ typedef void (*encoder_t)(char *, int, const char *, int);
 
 void _read_and_encode(encoder_t encoder,
                       const char *key,
-                      protocol_t *protocol) {
+                      socket_t *socket) {
     char buffer[BUFFER_SIZE];
     int read;
     int offset = 0;
@@ -22,7 +21,7 @@ void _read_and_encode(encoder_t encoder,
     do {
         read = fread(buffer, sizeof(char), BUFFER_SIZE, stdin);
         (*encoder)(buffer, read, key, offset);
-        protocol_client_send(protocol, buffer, read);
+        socket_send(socket, buffer, read);
         offset += read;
     } while (read == BUFFER_SIZE);
 }
@@ -44,12 +43,9 @@ void client(const char *host, const char *port,
     socket_t socket;
     socket_init(&socket, host, port);
     socket_connect(&socket);
-    protocol_t protocol;
-    protocol_init(&protocol, &socket);
 
     encoder_t encoder = _get_encoder_function(method);
-    _read_and_encode(encoder, key, &protocol);
+    _read_and_encode(encoder, key, &socket);
 
-    protocol_destroy(&protocol);
     socket_destroy(&socket);
 }
