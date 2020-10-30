@@ -26,16 +26,13 @@ void _read_and_decode(socket_t *socket,
                       decoder_t decoder) {
     int cont = BUFFER_SIZE;
     int offset = 0;
-    char* buffer = NULL;
     while (cont == BUFFER_SIZE) {
-        if (buffer != NULL) {
-            free(buffer);
-        }
-        buffer = calloc(BUFFER_SIZE + 1, sizeof(char));
+        char* buffer = calloc(BUFFER_SIZE + 1, sizeof(char));
         cont = socket_receive(socket, buffer, BUFFER_SIZE);
         (*decoder)(buffer, cont, key, offset);
         printf("%s", buffer);
         offset += cont;
+        free(buffer);
     }
 }
 
