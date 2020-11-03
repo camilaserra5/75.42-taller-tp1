@@ -48,7 +48,9 @@ bool socket_init(socket_t *skt, const char *host, const char *port) {
         return false;
     }
     for (addr_info = skt->info; addr_info; addr_info = addr_info->ai_next) {
-        skt->fd = socket(addr_info->ai_family, addr_info->ai_socktype, addr_info->ai_protocol);
+        skt->fd = socket(addr_info->ai_family, 
+                         addr_info->ai_socktype,
+                         addr_info->ai_protocol);
         if (skt->fd < 0) {
             continue;
         }
