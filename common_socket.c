@@ -52,6 +52,7 @@ bool socket_init(socket_t *skt, const char *host, const char *port) {
                          addr_info->ai_socktype,
                          addr_info->ai_protocol);
         if (skt->fd < 0) {
+            freeaddrinfo(skt->info);
             continue;
         }
         break;
